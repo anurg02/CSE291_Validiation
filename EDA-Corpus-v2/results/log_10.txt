@@ -1,0 +1,119 @@
+OpenROAD v2.0-19576-gec1bf1a13 
+Features included (+) or not (-): +GPU +GUI +Python : None
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+[WARNING ORD-0039] .openroad ignored with -python
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/NangateOpenCellLibrary.tech.lef, created 22 layers, 27 vias
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_64x21.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_256x32.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_512x64.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_256x48.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_64x32.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_2048x39.lef, created 1 library cells
+[WARNING ODB-0229] Error: library (NangateOpenCellLibrary.tech) already exists
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/NangateOpenCellLibrary.macro.lef, created 134 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_32x32.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_256x16.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_128x116.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_128x32.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_64x124.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_64x96.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_256x96.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_64x7.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_64x15.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_1024x32.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/NangateOpenCellLibrary.macro.rect.lef, created 134 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_128x256.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_64x64.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/NangateOpenCellLibrary.macro.mod.lef, created 135 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_256x95.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_32x64.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_256x34.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_64x62.lef, created 1 library cells
+[WARNING IFP-0028] Core area lower left (5.000, 5.000) snapped to (5.130, 5.600).
+[INFO IFP-0001] Added 28 rows of 262 site FreePDK45_38x28_10R_NP_162NW_34O.
+[INFO PPL-0001] Number of available slots 100
+[INFO PPL-0002] Number of I/O             54
+[INFO PPL-0003] Number of I/O w/sink      54
+[INFO PPL-0004] Number of I/O w/o sink    0
+[INFO PPL-0012] I/O nets HPWL: 2236.40 um.
+[INFO GPL-0002] DBU: 2000
+[INFO GPL-0003] SiteSize: (  0.190  1.400 ) um
+[INFO GPL-0004] CoreBBox: (  5.130  5.600 ) ( 54.910 44.800 ) um
+[INFO GPL-0006] NumInstances:               503
+[INFO GPL-0007] NumPlaceInstances:          503
+[INFO GPL-0008] NumFixedInstances:            0
+[INFO GPL-0009] NumDummyInstances:            0
+[INFO GPL-0010] NumNets:                    574
+[INFO GPL-0011] NumPins:                   1626
+[INFO GPL-0012] DieBBox:  (  0.000  0.000 ) ( 60.000 50.000 ) um
+[INFO GPL-0013] CoreBBox: (  5.130  5.600 ) ( 54.910 44.800 ) um
+[INFO GPL-0016] CoreArea:              1951.376 um^2
+[INFO GPL-0017] NonPlaceInstsArea:        0.000 um^2
+[INFO GPL-0018] PlaceInstsArea:         650.104 um^2
+[INFO GPL-0019] Util:                    33.315 %
+[INFO GPL-0020] StdInstsArea:           650.104 um^2
+[INFO GPL-0021] MacroInstsArea:           0.000 um^2
+[InitialPlace]  Iter: 1 CG residual: 0.00000011 HPWL: 9307850
+[InitialPlace]  Iter: 2 CG residual: 0.00000010 HPWL: 7732966
+[InitialPlace]  Iter: 3 CG residual: 0.00000011 HPWL: 7733815
+[InitialPlace]  Iter: 4 CG residual: 0.00000009 HPWL: 7736692
+[InitialPlace]  Iter: 5 CG residual: 0.00000006 HPWL: 7732484
+[INFO GPL-0031] FillerInit:NumGCells:       519
+[INFO GPL-0032] FillerInit:NumGNets:        574
+[INFO GPL-0033] FillerInit:NumGPins:       1626
+[INFO GPL-0023] TargetDensity:            0.343
+[INFO GPL-0024] AvrgPlaceInstArea:        1.292 um^2
+[INFO GPL-0025] IdealBinArea:             3.766 um^2
+[INFO GPL-0026] IdealBinCnt:                518
+[INFO GPL-0027] TotalBinArea:          1951.376 um^2
+[INFO GPL-0028] BinCnt:        16     16
+[INFO GPL-0029] BinSize: (  3.111  2.450 )
+[INFO GPL-0030] NumBins: 256
+[NesterovSolve] Iter:    1 overflow: 0.880 HPWL: 6261208
+[NesterovSolve] Iter:   10 overflow: 0.748 HPWL: 8041754
+[NesterovSolve] Iter:   20 overflow: 0.743 HPWL: 8053296
+[NesterovSolve] Iter:   30 overflow: 0.734 HPWL: 8130530
+[NesterovSolve] Iter:   40 overflow: 0.723 HPWL: 8225675
+[NesterovSolve] Iter:   50 overflow: 0.710 HPWL: 8353088
+[NesterovSolve] Iter:   60 overflow: 0.691 HPWL: 8521832
+[NesterovSolve] Iter:   70 overflow: 0.663 HPWL: 8703909
+[NesterovSolve] Iter:   80 overflow: 0.638 HPWL: 8952597
+[NesterovSolve] Iter:   90 overflow: 0.600 HPWL: 9171199
+[INFO GPL-0088] Routability snapshot saved at iter = 89
+[NesterovSolve] Iter:  100 overflow: 0.561 HPWL: 9381839
+[NesterovSolve] Iter:  110 overflow: 0.513 HPWL: 9536619
+[NesterovSolve] Iter:  120 overflow: 0.458 HPWL: 9642942
+[NesterovSolve] Iter:  130 overflow: 0.402 HPWL: 9734320
+[NesterovSolve] Iter:  140 overflow: 0.346 HPWL: 9821894
+[NesterovSolve] Iter:  150 overflow: 0.292 HPWL: 9853353
+[INFO GPL-0075] Routability iteration: 1
+[INFO GPL-0036] TileBBox: (    0    0 ) ( 4200 4200 ) DBU
+[INFO GPL-0038] TileCnt:      28   23
+[INFO GPL-0040] NumTiles: 644
+[INFO GPL-0081] TotalRouteOverflow: 0.0000
+[INFO GPL-0082] OverflowTileCnt: 0
+[INFO GPL-0083] 0.5%RC: 0.5060
+[INFO GPL-0084] 1.0%RC: 0.4845
+[INFO GPL-0085] 2.0%RC: 0.4623
+[INFO GPL-0086] 5.0%RC: 0.4290
+[INFO GPL-0087] FinalRC: 0.495251
+[INFO GPL-0077] FinalRC lower than targetRC(1.0100), routability not needed.
+[NesterovSolve] Iter:  160 overflow: 0.247 HPWL: 9822369
+[NesterovSolve] Iter:  170 overflow: 0.223 HPWL: 9880149
+[NesterovSolve] Iter:  180 overflow: 0.197 HPWL: 9958738
+[NesterovSolve] Iter:  190 overflow: 0.171 HPWL: 10007806
+[NesterovSolve] Iter:  200 overflow: 0.150 HPWL: 10065223
+[NesterovSolve] Iter:  210 overflow: 0.130 HPWL: 10087513
+[NesterovSolve] Iter:  220 overflow: 0.114 HPWL: 10114765
+[NesterovSolve] Finished with Overflow: 0.097822
+Traceback (most recent call last):
+  File "/work/OpenROAD-Agent/EDA-Corpus-v2/results/script_10.py", line 123, in <module>
+    design.getOpendp().detailedPlacement(max_disp_x, max_disp_y, "", False)
+  File "dpl_py.py", line 139, in detailedPlacement
+TypeError: Opendp_detailedPlacement expected at most 4 arguments, got 5
+Additional information:
+Wrong number or type of arguments for overloaded function 'Opendp_detailedPlacement'.
+  Possible C/C++ prototypes are:
+    dpl::Opendp::detailedPlacement(int,int,std::string const &)
+    dpl::Opendp::detailedPlacement(int,int)
