@@ -1,0 +1,92 @@
+OpenROAD v2.0-19576-gec1bf1a13 
+Features included (+) or not (-): +GPU +GUI +Python : None
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+[WARNING ORD-0039] .openroad ignored with -python
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/NangateOpenCellLibrary.tech.lef, created 22 layers, 27 vias
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_64x21.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_256x32.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_512x64.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_256x48.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_64x32.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_2048x39.lef, created 1 library cells
+[WARNING ODB-0229] Error: library (NangateOpenCellLibrary.tech) already exists
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/NangateOpenCellLibrary.macro.lef, created 134 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_32x32.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_256x16.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_128x116.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_128x32.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_64x124.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_64x96.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_256x96.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_64x7.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_64x15.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_1024x32.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/NangateOpenCellLibrary.macro.rect.lef, created 134 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_128x256.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_64x64.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/NangateOpenCellLibrary.macro.mod.lef, created 135 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_256x95.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_32x64.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_256x34.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../Design/nangate45/lef/fakeram45_64x62.lef, created 1 library cells
+Reading liberty files...
+Reading ../Design/nangate45/lib/fakeram45_256x96.lib
+Reading ../Design/nangate45/lib/fakeram45_64x64.lib
+Reading ../Design/nangate45/lib/fakeram45_128x32.lib
+Reading ../Design/nangate45/lib/fakeram45_512x64.lib
+Reading ../Design/nangate45/lib/fakeram45_64x124.lib
+Reading ../Design/nangate45/lib/fakeram45_256x32.lib
+Reading ../Design/nangate45/lib/fakeram45_256x16.lib
+Reading ../Design/nangate45/lib/fakeram45_32x32.lib
+Reading ../Design/nangate45/lib/fakeram45_256x95.lib
+Reading ../Design/nangate45/lib/fakeram45_256x34.lib
+Reading ../Design/nangate45/lib/fakeram45_64x15.lib
+Reading ../Design/nangate45/lib/fakeram45_64x7.lib
+Reading ../Design/nangate45/lib/fakeram45_64x96.lib
+Reading ../Design/nangate45/lib/fakeram45_64x21.lib
+Reading ../Design/nangate45/lib/fakeram45_1024x32.lib
+Reading ../Design/nangate45/lib/fakeram45_64x62.lib
+Reading ../Design/nangate45/lib/fakeram45_256x48.lib
+Reading ../Design/nangate45/lib/NangateOpenCellLibrary_typical.lib
+Reading ../Design/nangate45/lib/fakeram45_128x256.lib
+Reading ../Design/nangate45/lib/fakeram45_128x116.lib
+Reading ../Design/nangate45/lib/fakeram45_64x32.lib
+Reading ../Design/nangate45/lib/fakeram45_32x64.lib
+Reading ../Design/nangate45/lib/fakeram45_2048x39.lib
+Finished reading liberty files.
+Reading LEF files...
+Reading ../Design/nangate45/lef/NangateOpenCellLibrary.tech.lef
+Reading ../Design/nangate45/lef/fakeram45_64x21.lef
+Reading ../Design/nangate45/lef/fakeram45_256x32.lef
+Reading ../Design/nangate45/lef/fakeram45_512x64.lef
+Reading ../Design/nangate45/lef/fakeram45_256x48.lef
+Reading ../Design/nangate45/lef/fakeram45_64x32.lef
+Reading ../Design/nangate45/lef/fakeram45_2048x39.lef
+Reading ../Design/nangate45/lef/NangateOpenCellLibrary.tech.lef
+Reading ../Design/nangate45/lef/NangateOpenCellLibrary.macro.lef
+Reading ../Design/nangate45/lef/fakeram45_32x32.lef
+Reading ../Design/nangate45/lef/fakeram45_256x16.lef
+Reading ../Design/nangate45/lef/fakeram45_128x116.lef
+Reading ../Design/nangate45/lef/fakeram45_128x32.lef
+Reading ../Design/nangate45/lef/fakeram45_64x124.lef
+Reading ../Design/nangate45/lef/fakeram45_64x96.lef
+Reading ../Design/nangate45/lef/fakeram45_256x96.lef
+Reading ../Design/nangate45/lef/fakeram45_64x7.lef
+Reading ../Design/nangate45/lef/fakeram45_64x15.lef
+Reading ../Design/nangate45/lef/fakeram45_1024x32.lef
+Reading ../Design/nangate45/lef/NangateOpenCellLibrary.macro.rect.lef
+Reading ../Design/nangate45/lef/fakeram45_128x256.lef
+Reading ../Design/nangate45/lef/fakeram45_64x64.lef
+Reading ../Design/nangate45/lef/NangateOpenCellLibrary.macro.mod.lef
+Reading ../Design/nangate45/lef/fakeram45_256x95.lef
+Reading ../Design/nangate45/lef/fakeram45_32x64.lef
+Reading ../Design/nangate45/lef/fakeram45_256x34.lef
+Reading ../Design/nangate45/lef/fakeram45_64x62.lef
+Finished reading LEF files.
+Reading Verilog file: ../Design/gcd.v
+Traceback (most recent call last):
+  File "/work/OpenROAD-Agent/EDA-Corpus-v2/results_2/script_3.py", line 52, in <module>
+    design.readVerilog(verilogFile.as_posix())
+  File "openroad.py", line 469, in readVerilog
+RuntimeError: cannot read file ../Design/gcd.v.

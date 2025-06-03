@@ -1,0 +1,10 @@
+OpenROAD v2.0-19576-gec1bf1a13 
+Features included (+) or not (-): +GPU +GUI +Python : None
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+[WARNING ORD-0039] .openroad ignored with -python
+Traceback (most recent call last):
+  File "/work/OpenROAD-Agent/EDA-Corpus-v2/results_2/script_14.py", line 18, in <module>
+    design = openroad.Design(db) # Initialize Design with the created database
+  File "openroad.py", line 466, in __init__
+TypeError: in method 'new_Design', argument 1 of type 'ord::Tech *'

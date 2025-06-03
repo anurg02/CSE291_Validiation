@@ -1,0 +1,14 @@
+OpenROAD v2.0-19576-gec1bf1a13 
+Features included (+) or not (-): +GPU +GUI +Python : None
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+[WARNING ORD-0039] .openroad ignored with -python
+--- Initializing OpenROAD ---
+Reading liberty files from /work/OpenROAD-Agent/EDA-Corpus-v2/Design/nangate45/lib
+Reading LEF files from /work/OpenROAD-Agent/EDA-Corpus-v2/Design/nangate45/lef
+Reading Verilog netlist: /work/OpenROAD-Agent/EDA-Corpus-v2/Design/1_synth.v
+Traceback (most recent call last):
+  File "/work/OpenROAD-Agent/EDA-Corpus-v2/results_2/script_22.py", line 70, in <module>
+    design.readVerilog(verilog_file.as_posix())
+  File "openroad.py", line 469, in readVerilog
+RuntimeError: cannot read file /work/OpenROAD-Agent/EDA-Corpus-v2/Design/1_synth.v.

@@ -1,24 +1,37 @@
+import openroad as ord
 from openroad import Tech, Design, Timing
 from pathlib import Path
+import odb
+import pdn
+import psm
+import drt
+
+# --- Setup Paths and Design ---
+# Define paths to library and design files (replace with your actual paths)
+libDir = Path("lib")
+lefDir = Path("lef")
+designDir = Path(".")
+
+# Define design parameters
+verilog_file = designDir / "design.v" # Replace with your Verilog netlist file
+design_top_module_name = "top" # Replace with your top module name
+tech_lef_pattern = "*.tech.lef" # Pattern for technology LEF files
+cell_lef_pattern = "*.lef" # Pattern for cell LEF files
+lib_pattern = "*.lib" # Pattern for liberty files
 
 # Initialize OpenROAD objects and read technology files
 tech = Tech()
-# Set paths to library and design files
-libDir = Path("../Design/nangate45/lib")
-lefDir = Path("../Design/nangate45/lef")
-designDir = Path("../Design/")
-
-design_top_module_name = "gcd"
 
 # Read all liberty (.lib) and LEF files from the library directories
-libFiles = libDir.glob("*.lib")
-techLefFiles = lefDir.glob("*.tech.lef")
-lefFiles = lefDir.glob('*.lef')
-
-# Load liberty timing libraries
-for libFile in libFiles:
+print(f"Reading liberty files from {libDir}")
+for libFile in libDir.glob(lib_pattern):
     tech.readLiberty(libFile.as_posix())
-# Load technology and cell LEF files  
+
+print(f"Reading LEF files from {lefDir}")
+techLefFiles = lefDir.glob(tech_lef_pattern)
+lefFiles = lefDir.glob(cell_lef_pattern)
+
+# Load technology and cell LEF files
 for techLefFile in techLefFiles:
     tech.readLef(techLefFile.as_posix())
 for lefFile in lefFiles:
@@ -26,50 +39,118 @@ for lefFile in lefFiles:
 
 # Create design and read Verilog netlist
 design = Design(tech)
-verilogFile = designDir/str("1_synth.v")
-design.readVerilog(verilogFile.as_posix())
+print(f"Reading Verilog file {verilog_file}")
+design.readVerilog(verilog_file.as_posix())
+
+# Link the design to resolve hierarchical references
+print(f"Linking design top module: {design_top_module_name}")
 design.link(design_top_module_name)
 
-# Configure clock constraints
-# Create 20ns period clock on clk port
-design.evalTclString("create_clock -period 20 [get_ports clk] -name core_clock")
-design.evalTclString("set_propagated_clock [get_clocks {core_clock}]")
+# --- Clock Configuration ---
+# Define clock parameters
+clock_port_name = "clk_i"
+clock_period_ns = 40
+clock_name = "core_clock"
 
-import odb
-# Initialize floorplan with core and die area
+# Create clock signal on the specified port
+print(f"Creating clock {clock_name} on port {clock_port_name} with period {clock_period_ns} ns")
+design.evalTclString(f"create_clock -period {clock_period_ns} [get_ports {clock_port_name}] -name {clock_name}")
+
+# Set the clock as propagated for timing analysis
+print("Setting propagated clock")
+design.evalTclString(f"set_propagated_clock [get_clocks {{{clock_name}}}]")
+
+# --- Floorplanning ---
+print("Performing floorplanning")
 floorplan = design.getFloorplan()
-# Set die area to 60um x 50um
-die_area = odb.Rect(design.micronToDBU(0), design.micronToDBU(0),  
-    design.micronToDBU(60), design.micronToDBU(50))
-# Set core area to 50um x 40um with 5um margins
-core_area = odb.Rect(design.micronToDBU(5), design.micronToDBU(5),  
-    design.micronToDBU(55), design.micronToDBU(45))
-# Initialize floorplan with FreePDK45 site
-site = floorplan.findSite("FreePDK45_38x28_10R_NP_162NW_34O") 
+
+# Define die and core areas based on 10um margin
+# Assuming a hypothetical square die size for calculation purposes,
+# a real design would likely have target core dimensions or utilization.
+# Here we define core dimensions based on a target utilization (set later)
+# and define die area with a 10um margin around it.
+# Since initFloorplan requires explicit core/die rects, we'll define
+# a core area based on a conceptual size and calculate the die area from there.
+# A 1mm x 1mm core with 10um margin results in 1.02mm x 1.02mm die.
+core_size_um = 1000 # Hypothetical core size for margin calculation
+margin_um = 10
+die_size_um = core_size_um + 2 * margin_um
+
+# Define die area rectangle (from origin 0,0)
+die_area = odb.Rect(design.micronToDBU(0), design.micronToDBU(0),
+    design.micronToDBU(die_size_um), design.micronToDBU(die_size_um))
+
+# Define core area rectangle (with margin)
+core_area = odb.Rect(design.micronToDBU(margin_um), design.micronToDBU(margin_um),
+    design.micronToDBU(die_size_um - margin_um), design.micronToDBU(die_size_um - margin_um))
+
+# Find the site from the technology LEF
+site = floorplan.findSite("site") # Replace "site" with the actual site name from your LEF
+
+# Initialize the floorplan with the defined areas and site
 floorplan.initFloorplan(die_area, core_area, site)
+
+# Create placement tracks
 floorplan.makeTracks()
 
-# Configure and run I/O pin placement
-params = design.getIOPlacer().getParameters()
-params.setRandSeed(42)
-params.setMinDistanceInTracks(False)
-params.setMinDistance(design.micronToDBU(0))
-params.setCornerAvoidance(design.micronToDBU(0))
-# Place I/O pins on metal8 (horizontal) and metal9 (vertical) layers
-design.getIOPlacer().addHorLayer(design.getTech().getDB().getTech().findLayer("metal8"))
-design.getIOPlacer().addVerLayer(design.getTech().getDB().getTech().findLayer("metal9"))
-IOPlacer_random_mode = True
-design.getIOPlacer().runAnnealing(IOPlacer_random_mode)
+# Set target core utilization for placement (applied later)
+design.evalTclString("set core_utilization 0.50")
+print("Floorplan initialized with 10um margin and target utilization 50%")
 
-# Place macro blocks if present
+# --- I/O Pin Placement ---
+print("Placing I/O pins")
+io_placer = design.getIOPlacer()
+# Get routing layers for pin placement (replace with actual layer names if needed)
+metal8_layer = design.getTech().getDB().getTech().findLayer("metal8")
+metal9_layer = design.getTech().getDB().getTech().findLayer("metal9")
+
+if metal8_layer and metal9_layer:
+    # Add layers for horizontal and vertical pin placement
+    io_placer.addHorLayer(metal8_layer)
+    io_placer.addVerLayer(metal9_layer)
+
+    # Run I/O pin placement (using annealing with random mode)
+    io_placer.runAnnealing(True) # True for random mode
+    print("I/O pins placed on metal8 (horizontal) and metal9 (vertical)")
+else:
+    print("Warning: metal8 or metal9 layer not found. Skipping I/O pin placement.")
+
+
+# --- Macro Placement ---
+# Check if there are macros in the design
 macros = [inst for inst in design.getBlock().getInsts() if inst.getMaster().isBlock()]
+
 if len(macros) > 0:
+    print(f"Found {len(macros)} macros. Performing macro placement.")
     mpl = design.getMacroPlacer()
     block = design.getBlock()
     core = block.getCoreArea()
+
+    # Define halo size around macros
+    macro_halo_um = 5.0
+
+    # Define fence region as the core area
+    fence_lx = block.dbuToMicrons(core.xMin())
+    fence_ly = block.dbuToMicrons(core.yMin())
+    fence_ux = block.dbuToMicrons(core.xMax())
+    fence_uy = block.dbuToMicrons(core.yMax())
+
+    # Run macro placement
+    # Note: Direct control for minimum spacing between macros (5um requested)
+    # is not a direct parameter in this API call. The halo setting helps
+    # push standard cells away from macros, and overall placement density/params
+    # influence macro separation.
     mpl.place(
-        num_threads = 64, 
-        max_num_macro = len(macros)//8,
+        # Parameters are similar to Example 1; adjust as needed for your design
+        num_threads = 64,
+        max_num_macro = len(macros), # Place all macros
+        halo_width = macro_halo_um,
+        halo_height = macro_halo_um,
+        fence_lx = fence_lx,
+        fence_ly = fence_ly,
+        fence_ux = fence_ux,
+        fence_uy = fence_uy,
+        # Other parameters left at potential default/example values
         min_num_macro = 0,
         max_num_inst = 0,
         min_num_inst = 0,
@@ -78,12 +159,6 @@ if len(macros) > 0:
         coarsening_ratio = 10.0,
         large_net_threshold = 50,
         signature_net_threshold = 50,
-        halo_width = 2.0,
-        halo_height = 2.0,
-        fence_lx = block.dbuToMicrons(core.xMin()),
-        fence_ly = block.dbuToMicrons(core.yMin()),
-        fence_ux = block.dbuToMicrons(core.xMax()),
-        fence_uy = block.dbuToMicrons(core.yMax()),
         area_weight = 0.1,
         outline_weight = 100.0,
         wirelength_weight = 100.0,
@@ -93,432 +168,392 @@ if len(macros) > 0:
         notch_weight = 10.0,
         macro_blockage_weight = 10.0,
         pin_access_th = 0.0,
-        target_util = 0.25,
+        target_util = design.evalTclString("expr $::floorplan_core_utilization"), # Use core_utilization setting
         target_dead_space = 0.05,
         min_ar = 0.33,
-        snap_layer = 4,
+        snap_layer = 4, # Snap to metal4 tracks
         bus_planning_flag = False,
         report_directory = ""
     )
-
-# Configure and run global placement
-gpl = design.getReplace()
-gpl.setTimingDrivenMode(False)
-gpl.setRoutabilityDrivenMode(True)
-gpl.setUniformTargetDensityMode(True)
-# Limit initial placement iterations and set density penalty
-gpl.setInitialPlaceMaxIter(10)
-gpl.setInitDensityPenalityFactor(0.05)
-gpl.doInitialPlace(threads = 4)
-gpl.doNesterovPlace(threads = 4)
-gpl.reset()
-
-# Run initial detailed placement
-site = design.getBlock().getRows()[0].getSite()
-# Allow 1um x-displacement and 3um y-displacement
-max_disp_x = int(design.micronToDBU(1))
-max_disp_y = int(design.micronToDBU(3))
-# Remove filler cells to be able to move the cells
-design.getOpendp().removeFillers()
-design.getOpendp().detailedPlacement(max_disp_x, max_disp_y, "", False)
-
-import pdn, odb
-
-# Configure power delivery network
-# Set up global power/ground connections
-for net in design.getBlock().getNets():
-    if net.getSigType() == "POWER" or net.getSigType() == "GROUND":
-        net.setSpecial()  # Mark power/ground nets as special nets
-
-# Find existing power and ground nets or create if needed
-VDD_net = design.getBlock().findNet("VDD")
-VSS_net = design.getBlock().findNet("VSS")
-switched_power = None  # No switched power domain in this design
-secondary = list()  # No secondary power nets
-
-# Create VDD/VSS nets if they don't exist
-if VDD_net == None:
-    VDD_net = odb.dbNet_create(design.getBlock(), "VDD")
-    VDD_net.setSpecial()
-    VDD_net.setSigType("POWER")
-if VSS_net == None:
-    VSS_net = odb.dbNet_create(design.getBlock(), "VSS")
-    VSS_net.setSpecial()
-    VSS_net.setSigType("GROUND")
-
-# Connect power pins to global nets
-# Map standard VDD pins to power net for all instances
-design.getBlock().addGlobalConnect(region = None,
-    instPattern = ".*", 
-    pinPattern = "^VDD$",
-    net = VDD_net, 
-    do_connect = True)
-# Map peripheral domain VDD pins to power net
-design.getBlock().addGlobalConnect(region = None,
-    instPattern = ".*",
-    pinPattern = "^VDDPE$",
-    net = VDD_net,
-    do_connect = True)
-# Map core domain VDD pins to power net
-design.getBlock().addGlobalConnect(region = None,
-    instPattern = ".*",
-    pinPattern = "^VDDCE$",
-    net = VDD_net,
-    do_connect = True)
-# Map standard VSS pins to ground net
-design.getBlock().addGlobalConnect(region = None,
-    instPattern = ".*",
-    pinPattern = "^VSS$",
-    net = VSS_net, 
-    do_connect = True)
-# Map VSS pins with 'E' suffix to ground net
-design.getBlock().addGlobalConnect(region = None,
-    instPattern = ".*",
-    pinPattern = "^VSSE$",
-    net = VSS_net,
-    do_connect = True)
-# Apply the global connections
-design.getBlock().globalConnect()
-
-# Configure power domains
-pdngen = design.getPdnGen()
-# Set core power domain with primary power/ground nets
-pdngen.setCoreDomain(power = VDD_net,
-    switched_power = switched_power, 
-    ground = VSS_net,
-    secondary = secondary)
-
-# Set via cut pitch to 0 μm
-pdn_cut_pitch = [design.micronToDBU(0) for i in range(2)]
-
-# Get routing layers for power ring connections to pads
-ring_connect_to_pad_layers = list()
-for layer in design.getTech().getDB().getTech().getLayers():
-    if layer.getType() == "ROUTING":
-        ring_connect_to_pad_layers.append(layer)
-
-# Create power grid for standard cells
-domains = [pdngen.findDomain("Core")]
-# Set halo around macros for power grid routing
-halo = [design.micronToDBU(0) for i in range(4)]
-for domain in domains:
-    # Create the main core grid structure
-    pdngen.makeCoreGrid(domain = domain,
-    name = "top",
-    starts_with = pdn.GROUND,  # Start with ground net
-    pin_layers = [],
-    generate_obstructions = [],
-    powercell = None,
-    powercontrol = None,
-    powercontrolnetwork = "STAR")
-
-# Get metal layers for power grid implementation
-m1 = design.getTech().getDB().getTech().findLayer("metal1")
-m4 = design.getTech().getDB().getTech().findLayer("metal4")
-m7 = design.getTech().getDB().getTech().findLayer("metal7")
-m8 = design.getTech().getDB().getTech().findLayer("metal8")
-
-grid = pdngen.findGrid("top")
-for g in grid:
-    # Create horizontal power straps on metal1 for standard cell power rail connections
-    pdngen.makeFollowpin(grid = g,
-        layer = m1, 
-        width = design.micronToDBU(0.07),  # 0.07μm straps for standard cell rails
-        extend = pdn.CORE)
-  
-    # Create power straps on metal4 with 1.2μm width and 6μm pitch
-    pdngen.makeStrap(grid = g,
-        layer = m4,
-        width = design.micronToDBU(1.2), 
-        spacing = design.micronToDBU(1.2),
-        pitch = design.micronToDBU(6),
-        offset = design.micronToDBU(0), 
-        number_of_straps = 0,  # Auto-calculate number of straps
-        snap = False,
-        starts_with = pdn.GRID,
-        extend = pdn.CORE,
-        nets = [])
-    # Create power straps on metal7 with 1.4μm width and 10.8μm pitch
-    pdngen.makeStrap(grid = g,
-        layer = m7,
-        width = design.micronToDBU(1.4),
-        spacing = design.micronToDBU(1.4),
-        pitch = design.micronToDBU(10.8),
-        offset = design.micronToDBU(0),
-        number_of_straps = 0,
-        snap = False,
-        starts_with = pdn.GRID,
-        extend = pdn.CORE,
-        nets = [])
-    # Create power straps on metal7 with 1.4μm width and 10.8μm pitch
-    pdngen.makeStrap(grid = g,
-        layer = m8,
-        width = design.micronToDBU(1.4),
-        spacing = design.micronToDBU(1.4),
-        pitch = design.micronToDBU(10.8),
-        offset = design.micronToDBU(0),
-        number_of_straps = 0,
-        snap = False,
-        starts_with = pdn.GRID,
-        extend = pdn.BOUNDARY,
-        nets = [])
-  
-    # Create via connections between power grid layers
-    # Connect metal1 to metal4
-    pdngen.makeConnect(grid = g,
-        layer0 = m1,
-        layer1 = m4, 
-        cut_pitch_x = pdn_cut_pitch[0],
-        cut_pitch_y = pdn_cut_pitch[1],
-        vias = [],
-        techvias = [],
-        max_rows = 0,
-        max_columns = 0,
-        ongrid = [],
-        split_cuts = dict(),
-        dont_use_vias = "")
-    # Connect metal4 to metal7
-    pdngen.makeConnect(grid = g,
-        layer0 = m4,
-        layer1 = m7,
-        cut_pitch_x = pdn_cut_pitch[0],
-        cut_pitch_y = pdn_cut_pitch[1],
-        vias = [],
-        techvias = [],
-        max_rows = 0,
-        max_columns = 0,
-        ongrid = [],
-        split_cuts = dict(),
-        dont_use_vias = "")
-    # Connect metal7 to metal8
-    pdngen.makeConnect(grid = g,
-        layer0 = m7,
-        layer1 = m8,
-        cut_pitch_x = pdn_cut_pitch[0],
-        cut_pitch_y = pdn_cut_pitch[1],
-        vias = [],
-        techvias = [],
-        max_rows = 0,
-        max_columns = 0,
-        ongrid = [],
-        split_cuts = dict(),
-        dont_use_vias = "")
-
-# Create power grid for macro blocks
-# Define additional metal layers for macro connections
-macros = [inst for inst in design.getBlock().getInsts() if inst.getMaster().isBlock()]
-m5 = design.getTech().getDB().getTech().findLayer("metal5")
-m6 = design.getTech().getDB().getTech().findLayer("metal6")
-# Set PG ring config for macros
-macro_ring_width = [design.micronToDBU(1.5), design.micronToDBU(1.5)]
-macro_ring_spacing = [design.micronToDBU(1.5), design.micronToDBU(1.5)]
-macro_ring_core_offset = [design.micronToDBU(0) for i in range(4)]
-macro_ring_pad_offset = [design.micronToDBU(0) for i in range(4)]
-for i in range(len(macros)):
-    # Create separate power grid for each macro instance
-    for domain in domains:
-        pdngen.makeInstanceGrid(domain = domain,
-            name = "CORE_macro_grid_" + str(i),
-            starts_with = pdn.GROUND,
-            inst = macros[i],
-            halo = halo,
-            pg_pins_to_boundary = True,  # Connect power/ground pins to boundary
-            default_grid = False, 
-            generate_obstructions = [],
-            is_bump = False)
-    grid = pdngen.findGrid("CORE_macro_grid_" + str(i))
-    for g in grid:
-        # Create power ring around macro using metal5 and metal6
-        pdngen.makeRing(grid = g, 
-            layer0 = m5, 
-            width0 = macro_ring_width[0], 
-            spacing0 = macro_ring_spacing[0],
-            layer1 = m6, 
-            width1 = macro_ring_width[0], 
-            spacing1 = macro_ring_spacing[0],
-            starts_with = pdn.GRID, 
-            offset = macro_ring_core_offset, 
-            pad_offset = macro_ring_pad_offset, 
-            extend = False,
-            pad_pin_layers = macro_ring_connect_to_pad_layers, 
-            nets = [])
-        # Create power straps on metal5 for macro connections
-        pdngen.makeStrap(grid = g,
-            layer = m5,
-            width = design.micronToDBU(1.2), 
-            spacing = design.micronToDBU(1.2),
-            pitch = design.micronToDBU(6),
-            offset = design.micronToDBU(0),
-            number_of_straps = 0,
-            snap = True,  # Snap to grid
-            starts_with = pdn.GRID,
-            extend = pdn.RINGS,
-            nets = [])
-        # Create power straps on metal6 for macro connections
-        pdngen.makeStrap(grid = g,
-            layer = m6,
-            width = design.micronToDBU(1.2),
-            spacing = design.micronToDBU(1.2),
-            pitch = design.micronToDBU(6),
-            offset = design.micronToDBU(0),
-            number_of_straps = 0,
-            snap = True,
-            starts_with = pdn.GRID,
-            extend = pdn.RINGS,
-            nets = [])
-    
-        # Create via connections between macro power grid layers
-        # Connect metal4 (from core grid) to metal5 (macro grid)
-        pdngen.makeConnect(grid = g,
-            layer0 = m4,
-            layer1 = m5,
-            cut_pitch_x = pdn_cut_pitch[0],
-            cut_pitch_y = pdn_cut_pitch[1],
-            vias = [],
-            techvias = [],
-            max_rows = 0,
-            max_columns = 0,
-            ongrid = [],
-            split_cuts = dict(),
-            dont_use_vias = "")
-        # Connect metal5 to metal6 (macro grid layers)
-        pdngen.makeConnect(grid = g,
-            layer0 = m5,
-            layer1 = m6,
-            cut_pitch_x = pdn_cut_pitch[0],
-            cut_pitch_y = pdn_cut_pitch[1],
-            vias = [],
-            techvias = [],
-            max_rows = 0,
-            max_columns = 0,
-            ongrid = [],
-            split_cuts = dict(),
-            dont_use_vias = "")
-        # Connect metal6 (macro grid) to metal7 (core grid)
-        pdngen.makeConnect(grid = g,
-            layer0 = m6,
-            layer1 = m7,
-            cut_pitch_x = pdn_cut_pitch[0],
-            cut_pitch_y = pdn_cut_pitch[1],
-            vias = [],
-            techvias = [],
-            max_rows = 0,
-            max_columns = 0,
-            ongrid = [],
-            split_cuts = dict(),
-            dont_use_vias = "")
-
-# Generate the final power delivery network
-pdngen.checkSetup()  # Verify configuration
-pdngen.buildGrids(False)  # Build the power grid
-pdngen.writeToDb(True, )  # Write power grid to the design database
-pdngen.resetShapes()  # Reset temporary shapes 
-
-# Configure and run clock tree synthesis
-design.evalTclString("set_propagated_clock [get_clocks {core_clock}]")
-# Set RC values for clock and signal nets
-design.evalTclString("set_wire_rc -clock -resistance 0.03574 -capacitance 0.07516")
-design.evalTclString("set_wire_rc -signal -resistance 0.03574 -capacitance 0.07516")
-cts = design.getTritonCts()
-parms = cts.getParms()
-parms.setWireSegmentUnit(20)
-# Configure clock buffers
-cts.setBufferList("BUF_X2")
-cts.setRootBuffer("BUF_X2")
-cts.setSinkBuffer("BUF_X2")
-cts.runTritonCts()
-
-# Run final detailed placement
-site = design.getBlock().getRows()[0].getSite()
-max_disp_x = int(design.micronToDBU(1) / site.getWidth())
-max_disp_y = int(design.micronToDBU(3) / site.getHeight())
-design.getOpendp().detailedPlacement(max_disp_x, max_disp_y, "", False)
-
-import openroad as ord
-# Insert filler cells
-db = ord.get_db()
-filler_masters = list()
-# filler cells' naming convention
-filler_cells_prefix = "FILLCELL_"
-for lib in db.getLibs():
-    for master in lib.getMasters():
-        if master.getType() == "CORE_SPACER":
-            filler_masters.append(master)
-if len(filler_masters) == 0:
-    print("no filler cells in library!")
+    print(f"Macro placement complete with {macro_halo_um}um halo")
 else:
-    design.getOpendp().fillerPlacement(filler_masters = filler_masters, 
-                                     prefix = filler_cells_prefix,
-                                     verbose = False)
+    print("No macros found. Skipping macro placement.")
 
-# Configure and run global routing
-# Set routing layer ranges for signal and clock nets
-signal_low_layer = design.getTech().getDB().getTech().findLayer("metal1").getRoutingLevel()
-signal_high_layer = design.getTech().getDB().getTech().findLayer("metal7").getRoutingLevel()
-clk_low_layer = design.getTech().getDB().getTech().findLayer("metal1").getRoutingLevel()
-clk_high_layer = design.getTech().getDB().getTech().findLayer("metal7").getRoutingLevel()
+# --- Global Placement ---
+print("Performing global placement")
+gpl = design.getReplace()
+gpl.setTimingDrivenMode(False) # Not timing driven in this flow step
+gpl.setRoutabilityDrivenMode(True) # Enable routability driven placement
+gpl.setUniformTargetDensityMode(True)
+# Set initial placement iterations as requested (30)
+gpl.setInitialPlaceMaxIter(30)
+gpl.setInitDensityPenalityFactor(0.05)
 
-grt = design.getGlobalRouter()
-grt.setMinRoutingLayer(signal_low_layer)
-grt.setMaxRoutingLayer(signal_high_layer)
-grt.setMinLayerForClock(clk_low_layer)
-grt.setMaxLayerForClock(clk_high_layer)
-grt.setAdjustment(0.5)
-grt.setVerbose(True)
-grt.globalRoute(True)
+# Run global placement
+gpl.doInitialPlace(threads = 4) # Use 4 threads
+gpl.doNesterovPlace(threads = 4) # Use 4 threads
+gpl.reset()
+print("Global placement complete")
 
-import drt
+# --- Detailed Placement (Initial) ---
+print("Performing initial detailed placement")
+opendp = design.getOpendp()
 
-# Configure and run detailed routing
-drter = design.getTritonRoute()
-params = drt.ParamStruct()
-params.outputMazeFile = ""
-params.outputDrcFile = ""
-params.outputCmapFile = ""
-params.outputGuideCoverageFile = ""
-params.dbProcessNode = ""
-params.enableViaGen = True
-params.drouteEndIter = 1
-params.viaInPinBottomLayer = ""
-params.viaInPinTopLayer = ""
-params.orSeed = -1
-params.orK = 0
-params.bottomRoutingLayer = "metal1"
-params.topRoutingLayer = "metal7"
-params.verbose = 1
-params.cleanPatches = True
-params.doPa = True
-params.singleStepDR = False
-params.minAccessPoints = 1
-params.saveGuideUpdates = False
-drter.setParams(params)
-drter.main()
+# Remove filler cells before detailed placement if they exist from a previous run
+# This step is often needed if design is loaded from a DEF with fillers
+opendp.removeFillers()
 
-# Write final DEF file
-design.writeDef("final.def")
+# Set maximum displacement for detailed placement (0um for x and y)
+max_disp_um_x = 0
+max_disp_um_y = 0
+# Convert micrometers to DBU (Database Units) for the API call
+max_disp_x_dbu = int(design.micronToDBU(max_disp_um_x))
+max_disp_y_dbu = int(design.micronToDBU(max_disp_um_y))
 
-# Write final Verilog file
-design.evalTclString("write_verilog final.v")
+# Run detailed placement
+opendp.detailedPlacement(max_disp_x_dbu, max_disp_y_dbu, "", False) # "" for default cell list, False for non-CTS mode
+print(f"Initial detailed placement complete (max displacement X={max_disp_um_x}um, Y={max_disp_um_y}um)")
 
-import psm
+# --- Clock Tree Synthesis (CTS) ---
+print("Performing Clock Tree Synthesis (CTS)")
+# Ensure propagated clock is set (redundant but safe after placement)
+design.evalTclString(f"set_propagated_clock [get_clocks {{{clock_name}}}]")
 
-# Run static IR drop analysis
-psm_obj = design.getPDNSim()
-timing = Timing(design)
-source_types = [psm.GeneratedSourceType_FULL,
-    psm.GeneratedSourceType_STRAPS,
-    psm.GeneratedSourceType_BUMPS]
-# Analyze VDD power grid IR drop
-psm_obj.analyzePowerGrid(net = design.getBlock().findNet("VDD"),
-    enable_em = False, corner = timing.getCorners()[0],
-    use_prev_solution = False,
-    em_file = "",
-    error_file = "",
-    voltage_source_file = "",
-    voltage_file = "",
-    source_type = source_types[2])
+# Set unit resistance and capacitance for wires
+rc_resistance = 0.0435
+rc_capacitance = 0.0817
+print(f"Setting wire RC: Resistance={rc_resistance}, Capacitance={rc_capacitance}")
+design.evalTclString(f"set_wire_rc -clock -resistance {rc_resistance} -capacitance {rc_capacitance}")
+design.evalTclString(f"set_wire_rc -signal -resistance {rc_resistance} -capacitance {rc_capacitance}")
 
-design.evalTclString("report_power")
+# Get the CTS tool object
+cts = design.getTritonCts()
 
-# Write final odb file
-design.writeDb("final.odb")
+# Set clock buffer cells to be used
+buffer_cell_name = "BUF_X3" # Replace with actual buffer cell name if different
+print(f"Setting CTS buffers to: {buffer_cell_name}")
+cts.setBufferList(buffer_cell_name)
+cts.setRootBuffer(buffer_cell_name) # Use specified buffer for root
+cts.setSinkBuffer(buffer_cell_name) # Use specified buffer for sinks
+
+# Run CTS
+cts.runTritonCts()
+print("CTS complete")
+
+# --- Detailed Placement (Post-CTS) ---
+print("Performing post-CTS detailed placement")
+# Remove filler cells again before post-CTS detailed placement
+opendp.removeFillers()
+# Rerun detailed placement with the same constraints (0um displacement)
+opendp.detailedPlacement(max_disp_x_dbu, max_disp_y_dbu, "", False)
+print("Post-CTS detailed placement complete")
+
+
+# --- Power Delivery Network (PDN) Construction ---
+print("Constructing Power Delivery Network (PDN)")
+pdngen = design.getPdnGen()
+block = design.getBlock()
+
+# Set power and ground nets as special nets
+# Find or create VDD and VSS nets
+VDD_net = block.findNet("VDD")
+VSS_net = block.findNet("VSS")
+
+# Create nets if they don't exist
+if VDD_net is None:
+    print("Creating VDD net")
+    VDD_net = odb.dbNet_create(block, "VDD")
+    VDD_net.setSigType("POWER") # Set signal type
+    VDD_net.setSpecial() # Mark as special net
+if VSS_net is None:
+    print("Creating VSS net")
+    VSS_net = odb.dbNet_create(block, "VSS")
+    VSS_net.setSigType("GROUND") # Set signal type
+    VSS_net.setSpecial() # Mark as special net
+
+# Configure global power/ground connections for standard cells
+# Connect instances' VDD/VSS pins to the global VDD/VSS nets
+# Assumes default pin names VDD and VSS
+print("Adding global power/ground connections")
+block.addGlobalConnect(region = None, instPattern = ".*", pinPattern = "^VDD$", net = VDD_net, do_connect = True)
+block.addGlobalConnect(region = None, instPattern = ".*", pinPattern = "^VSS$", net = VSS_net, do_connect = True)
+# Apply the global connections
+block.globalConnect()
+
+# Define the core voltage domain
+print("Setting core voltage domain")
+pdngen.setCoreDomain(power = VDD_net, switched_power = None, ground = VSS_net, secondary = list())
+
+# Get the core voltage domain object
+core_domain = pdngen.findDomain("Core")
+if not core_domain:
+    print("Error: Core domain not found.")
+    exit()
+
+# Create the main core power grid structure
+print("Creating core grid")
+pdngen.makeCoreGrid(
+    domain = core_domain,
+    name = "core_grid",
+    starts_with = pdn.GROUND # Start with ground net stripe
+)
+core_grid = pdngen.findGrid("core_grid")
+if not core_grid:
+    print("Error: Core grid not found.")
+    exit()
+
+
+# Get required metal layers (replace with actual layer names if needed)
+metal1_layer = design.getTech().getDB().getTech().findLayer("metal1")
+metal4_layer = design.getTech().getDB().getTech().findLayer("metal4")
+metal5_layer = design.getTech().getDB().getTech().findLayer("metal5")
+metal6_layer = design.getTech().getDB().getTech().findLayer("metal6")
+metal7_layer = design.getTech().getDB().getTech().findLayer("metal7")
+metal8_layer = design.getTech().getDB().getTech().findLayer("metal8")
+
+if not all([metal1_layer, metal4_layer, metal5_layer, metal6_layer, metal7_layer, metal8_layer]):
+    print("Error: One or more required metal layers not found. Skipping PDN construction.")
+else:
+    # --- Core/Standard Cell PDN ---
+    print("Adding core/standard cell PDN features")
+    # Add power rings around core area
+    ring_width_um_core = 5
+    ring_spacing_um_core = 5
+    print(f"Adding core rings on {metal7_layer.getName()} and {metal8_layer.getName()} ({ring_width_um_core}um W, {ring_spacing_um_core}um S)")
+    pdngen.makeRing(
+        grid = core_grid,
+        layer0 = metal7_layer, width0 = design.micronToDBU(ring_width_um_core), spacing0 = design.micronToDBU(ring_spacing_um_core),
+        layer1 = metal8_layer, width1 = design.micronToDBU(ring_width_um_core), spacing1 = design.micronToDBU(ring_spacing_um_core),
+        starts_with = pdn.GRID, # Align to grid pattern
+        offset = [design.micronToDBU(0)]*4, # 0um offset from core boundary
+        pad_offset = [design.micronToDBU(0)]*4, # 0um pad offset
+        extend = False, # Do not extend rings
+        pad_pin_layers = list(), # No specific pad pin layers needed for rings
+        nets = list() # Apply to both VDD/VSS in the grid
+    )
+
+    # Add horizontal power straps following standard cell power pins (M1)
+    strap_width_m1_um = 0.07
+    print(f"Adding standard cell followpin straps on {metal1_layer.getName()} ({strap_width_m1_um}um W)")
+    pdngen.makeFollowpin(
+        grid = core_grid,
+        layer = metal1_layer,
+        width = design.micronToDBU(strap_width_m1_um),
+        extend = pdn.CORE # Extend across the core area
+    )
+
+    # Add power straps on M4
+    strap_width_m4_um = 1.2
+    strap_spacing_m4_um = 1.2
+    strap_pitch_m4_um = 6
+    print(f"Adding straps on {metal4_layer.getName()} ({strap_width_m4_um}um W, {strap_spacing_m4_um}um S, {strap_pitch_m4_um}um P)")
+    pdngen.makeStrap(
+        grid = core_grid,
+        layer = metal4_layer,
+        width = design.micronToDBU(strap_width_m4_um),
+        spacing = design.micronToDBU(strap_spacing_m4_um),
+        pitch = design.micronToDBU(strap_pitch_m4_um),
+        offset = design.micronToDBU(0), # 0um offset
+        number_of_straps = 0, # Auto-calculate number
+        snap = False, # Do not snap to grid explicitly (pitch defines placement)
+        starts_with = pdn.GRID, # Align to grid pattern
+        extend = pdn.CORE, # Extend across the core area
+        nets = list() # Apply to both VDD/VSS in the grid
+    )
+
+    # Add power straps on M7 and M8
+    strap_width_m7m8_um = 1.4
+    strap_spacing_m7m8_um = 1.4
+    strap_pitch_m7m8_um = 10.8
+    print(f"Adding straps on {metal7_layer.getName()} and {metal8_layer.getName()} ({strap_width_m7m8_um}um W, {strap_spacing_m7m8_um}um S, {strap_pitch_m7m8_um}um P)")
+    pdngen.makeStrap(
+        grid = core_grid,
+        layer = metal7_layer,
+        width = design.micronToDBU(strap_width_m7m8_um),
+        spacing = design.micronToDBU(strap_spacing_m7m8_um),
+        pitch = design.micronToDBU(strap_pitch_m7m8_um),
+        offset = design.micronToDBU(0),
+        number_of_straps = 0,
+        snap = False,
+        starts_with = pdn.GRID,
+        extend = pdn.RINGS, # Extend to connect to the core rings
+        nets = list()
+    )
+    pdngen.makeStrap(
+        grid = core_grid,
+        layer = metal8_layer,
+        width = design.micronToDBU(strap_width_m7m8_um),
+        spacing = design.micronToDBU(strap_spacing_m7m8_um),
+        pitch = design.micronToDBU(strap_pitch_m7m8_um),
+        offset = design.micronToDBU(0),
+        number_of_straps = 0,
+        snap = False,
+        starts_with = pdn.GRID,
+        extend = pdn.BOUNDARY, # Extend to the boundary
+        nets = list()
+    )
+
+    # --- Macro PDN (if macros exist) ---
+    if len(macros) > 0:
+        print("Adding macro-specific PDN features")
+        ring_width_um_macro = 2
+        ring_spacing_um_macro = 2
+        strap_width_macro_um = 1.2
+        strap_spacing_macro_um = 1.2
+        strap_pitch_macro_um = 6
+
+        # Iterate through each macro instance
+        for i, macro_inst in enumerate(macros):
+            macro_inst_name = macro_inst.getName()
+            macro_grid_name = f"macro_grid_{macro_inst_name}_{i}"
+            print(f"Creating macro grid for {macro_inst_name} ({macro_grid_name})")
+
+            # Create a power grid specific to this macro instance
+            pdngen.makeInstanceGrid(
+                domain = core_domain, # Assign to the core domain
+                name = macro_grid_name,
+                starts_with = pdn.GROUND,
+                inst = macro_inst,
+                halo = [design.micronToDBU(0)]*4, # No halo needed for instance grid itself
+                pg_pins_to_boundary = True, # Place VDD/VSS pins on boundary
+                default_grid = False, # Not the default grid for the domain
+                generate_obstructions = [],
+                is_bump = False
+            )
+            macro_grid = pdngen.findGrid(macro_grid_name)
+            if not macro_grid:
+                print(f"Error: Macro grid {macro_grid_name} not found.")
+                continue
+
+            # Add power rings around the macro
+            print(f"Adding macro rings on {metal5_layer.getName()} and {metal6_layer.getName()} ({ring_width_um_macro}um W, {ring_spacing_um_macro}um S)")
+            pdngen.makeRing(
+                grid = macro_grid,
+                layer0 = metal5_layer, width0 = design.micronToDBU(ring_width_um_macro), spacing0 = design.micronToDBU(ring_spacing_um_macro),
+                layer1 = metal6_layer, width1 = design.micronToDBU(ring_width_um_macro), spacing1 = design.micronToDBU(ring_spacing_um_macro),
+                starts_with = pdn.GRID,
+                offset = [design.micronToDBU(0)]*4,
+                pad_offset = [design.micronToDBU(0)]*4,
+                extend = False,
+                pad_pin_layers = list(),
+                nets = list()
+            )
+
+            # Add power straps within the macro grid (M5, M6)
+            print(f"Adding macro straps on {metal5_layer.getName()} and {metal6_layer.getName()} ({strap_width_macro_um}um W, {strap_spacing_macro_um}um S, {strap_pitch_macro_um}um P)")
+            pdngen.makeStrap(
+                grid = macro_grid,
+                layer = metal5_layer,
+                width = design.micronToDBU(strap_width_macro_um),
+                spacing = design.micronToDBU(strap_spacing_macro_um),
+                pitch = design.micronToDBU(strap_pitch_macro_um),
+                offset = design.micronToDBU(0),
+                number_of_straps = 0,
+                snap = True, # Snap to grid defined by pitch
+                starts_with = pdn.GRID,
+                extend = pdn.RINGS, # Extend to macro rings
+                nets = list()
+            )
+            pdngen.makeStrap(
+                grid = macro_grid,
+                layer = metal6_layer,
+                width = design.micronToDBU(strap_width_macro_um),
+                spacing = design.micronToDBU(strap_spacing_macro_um),
+                pitch = design.micronToDBU(strap_pitch_macro_um),
+                offset = design.micronToDBU(0),
+                number_of_straps = 0,
+                snap = True,
+                starts_with = pdn.GRID,
+                extend = pdn.RINGS,
+                nets = list()
+            )
+
+            # Add via connections between macro grid layers and to core grid layers
+            via_cut_pitch_um = 2
+            via_cut_pitch_dbu = [design.micronToDBU(via_cut_pitch_um), design.micronToDBU(via_cut_pitch_um)]
+            print(f"Adding via connections with cut pitch {via_cut_pitch_um}um")
+
+            # Connections within macro grid (M5-M6)
+            pdngen.makeConnect(
+                grid = macro_grid,
+                layer0 = metal5_layer, layer1 = metal6_layer,
+                cut_pitch_x = via_cut_pitch_dbu[0], cut_pitch_y = via_cut_pitch_dbu[1]
+            )
+            # Connections from macro grid to core grid layers
+            pdngen.makeConnect(
+                grid = macro_grid,
+                layer0 = metal4_layer, layer1 = metal5_layer,
+                cut_pitch_x = via_cut_pitch_dbu[0], cut_pitch_y = via_cut_pitch_dbu[1]
+            )
+            pdngen.makeConnect(
+                grid = macro_grid,
+                layer0 = metal6_layer, layer1 = metal7_layer,
+                cut_pitch_x = via_cut_pitch_dbu[0], cut_pitch_y = via_cut_pitch_dbu[1]
+            )
+
+    # --- Core Grid Via Connections ---
+    print("Adding via connections for core grid")
+    via_cut_pitch_um = 2
+    via_cut_pitch_dbu = [design.micronToDBU(via_cut_pitch_um), design.micronToDBU(via_cut_pitch_um)]
+    print(f"Adding core grid via connections with cut pitch {via_cut_pitch_um}um")
+
+    # Connections within core grid layers
+    pdngen.makeConnect(
+        grid = core_grid,
+        layer0 = metal1_layer, layer1 = metal4_layer,
+        cut_pitch_x = via_cut_pitch_dbu[0], cut_pitch_y = via_cut_pitch_dbu[1]
+    )
+    pdngen.makeConnect(
+        grid = core_grid,
+        layer0 = metal4_layer, layer1 = metal7_layer,
+        cut_pitch_x = via_cut_pitch_dbu[0], cut_pitch_y = via_cut_pitch_dbu[1]
+    )
+    pdngen.makeConnect(
+        grid = core_grid,
+        layer0 = metal7_layer, layer1 = metal8_layer,
+        cut_pitch_x = via_cut_pitch_dbu[0], cut_pitch_y = via_cut_pitch_dbu[1]
+    )
+
+    # --- Build and Write PDN ---
+    print("Building and writing PDN")
+    pdngen.checkSetup() # Verify the PDN setup
+    pdngen.buildGrids(False) # Build the power grid shapes
+    pdngen.writeToDb(True) # Write the generated shapes to the design database
+    pdngen.resetShapes() # Clear temporary shapes
+
+    print("PDN construction complete")
+
+    # --- Static IR Drop Analysis ---
+    print("Performing static IR drop analysis on VDD net")
+    psm_obj = design.getPDNSim()
+    # Get the first timing corner for analysis (timing setup is required)
+    timing = Timing(design)
+    corners = timing.getCorners()
+    if not corners:
+        print("Error: No timing corners found. Cannot perform IR drop analysis.")
+    else:
+        # Analyze the VDD power grid
+        # The analyzePowerGrid function analyzes the grid connected to the net.
+        # It does not have a specific parameter to analyze *only* a single layer like M1.
+        # The analysis will include contributions from all connected metal layers (M1-M8 in this case).
+        # To focus on M1 drop, one would typically look at the voltage report output
+        # and inspect node voltages on the M1 layer.
+        # Using FULL source type for comprehensive analysis.
+        print(f"Analyzing VDD net using timing corner: {corners[0].getName()}")
+        psm_obj.analyzePowerGrid(
+            net = VDD_net,
+            enable_em = False, # EM analysis disabled
+            corner = corners[0],
+            use_prev_solution = False,
+            source_type = psm.GeneratedSourceType_FULL # Use full current sources
+        )
+        print("Static IR drop analysis complete for VDD net.")
+        # Results are typically written to internal database or report files (not explicitly requested here).
+        # Voltage maps can be viewed in GUI or dumped via other commands if needed.
+
+
+# --- Write Output DEF ---
+output_def_file = "PDN.def"
+print(f"Writing final DEF file: {output_def_file}")
+design.writeDef(output_def_file)
+print("Script finished.")

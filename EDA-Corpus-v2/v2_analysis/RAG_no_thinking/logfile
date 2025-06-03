@@ -1,0 +1,26 @@
+Signal 11 received
+Stack trace:
+ 0# 0x0000557D14D76F0D in openroad
+ 1# 0x00007FD7227DC520 in /lib/x86_64-linux-gnu/libc.so.6
+ 2# odb::_dbBlock::initialize(odb::_dbChip*, odb::_dbTech*, odb::_dbBlock*, char const*, char) in openroad
+ 3# odb::dbBlock::create(odb::dbChip*, char const*, odb::dbTech*, char) in openroad
+ 4# ord::Verilog2db::makeBlock() in openroad
+ 5# ord::dbLinkDesign(char const*, ord::dbVerilogNetwork*, odb::dbDatabase*, utl::Logger*, bool) in openroad
+ 6# ord::OpenRoad::linkDesign(char const*, bool) in openroad
+ 7# 0x0000557D163395E8 in openroad
+ 8# 0x00007FD722E20008 in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+ 9# _PyObject_MakeTpCall in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+10# _PyEval_EvalFrameDefault in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+11# 0x00007FD722EBA3AF in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+12# _PyEval_EvalFrameDefault in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+13# 0x00007FD722EBA3AF in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+14# PyEval_EvalCode in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+15# 0x00007FD722F044CD in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+16# _PyRun_SimpleFileObject in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+17# _PyRun_AnyFileObject in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+18# Py_RunMain in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+19# main in openroad
+20# 0x00007FD7227C3D90 in /lib/x86_64-linux-gnu/libc.so.6
+21# __libc_start_main in /lib/x86_64-linux-gnu/libc.so.6
+22# _start in openroad
+Segmentation fault (core dumped)

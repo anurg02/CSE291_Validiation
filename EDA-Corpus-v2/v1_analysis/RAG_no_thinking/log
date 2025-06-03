@@ -1,0 +1,72 @@
+y
+OpenROAD v2.0-19576-gec1bf1a13
+Features included (+) or not (-): +GPU +GUI +Python : None
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+[WARNING ORD-0039] .openroad ignored with -python
+Traceback (most recent call last):
+  File "/work/OpenROAD-Agent/EDA-Corpus-v2/v1_analysis/RAG_no_thinking/script.py", line 37, in <module>
+    design.readVerilog(verilogFile.as_posix())
+  File "openroad.py", line 469, in readVerilog
+RuntimeError: cannot read file ../Design/1_synth.v.
+(base) root@d6167358ff2a:/work/OpenROAD-Agent/EDA-Corpus-v2/v1_analysis/RAG_no_thinking# vim script.py
+(base) root@d6167358ff2a:/work/OpenROAD-Agent/EDA-Corpus-v2/v1_analysis/RAG_no_thinking# vim script.py
+(base) root@d6167358ff2a:/work/OpenROAD-Agent/EDA-Corpus-v2/v1_analysis/RAG_no_thinking# vim script.py
+(base) root@d6167358ff2a:/work/OpenROAD-Agent/EDA-Corpus-v2/v1_analysis/RAG_no_thinking# openroad -python -exit script.py
+OpenROAD v2.0-19576-gec1bf1a13
+Features included (+) or not (-): +GPU +GUI +Python : None
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+[WARNING ORD-0039] .openroad ignored with -python
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/NangateOpenCellLibrary.tech.lef, created 22 layers, 27 vias
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_64x21.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_256x32.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_512x64.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_256x48.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_64x32.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_2048x39.lef, created 1 library cells
+[WARNING ODB-0229] Error: library (NangateOpenCellLibrary.tech) already exists
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/NangateOpenCellLibrary.macro.lef, created 134 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_32x32.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_256x16.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_128x116.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_128x32.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_64x124.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_64x96.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_256x96.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_64x7.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_64x15.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_1024x32.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/NangateOpenCellLibrary.macro.rect.lef, created 134 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_128x256.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_64x64.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/NangateOpenCellLibrary.macro.mod.lef, created 135 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_256x95.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_32x64.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_256x34.lef, created 1 library cells
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_64x62.lef, created 1 library cells
+Signal 11 received
+Stack trace:
+ 0# 0x000055D7F642FF0D in openroad
+ 1# 0x00007F1A87CA6520 in /lib/x86_64-linux-gnu/libc.so.6
+ 2# odb::dbSite::getName[abi:cxx11]() const in openroad
+ 3# ifp::InitFloorplan::makeRows(odb::Rect const&, odb::dbSite*, std::vector<odb::dbSite*, std::allocator<odb::dbSite*> > const&, ifp::RowParity, std::set<odb::dbSite*, std::less<odb::dbSite*>, std::allocator<odb::dbSite*> > const&) in openroad
+ 4# ifp::InitFloorplan::makeRowsWithSpacing(int, int, int, int, odb::dbSite*, std::vector<odb::dbSite*, std::allocator<odb::dbSite*> > const&, ifp::RowParity, std::set<odb::dbSite*, std::less<odb::dbSite*>, std::allocator<odb::dbSite*> > const&) in openroad
+ 5# 0x000055D7F7B517D0 in openroad
+ 6# 0x000055D7F7B5964A in openroad
+ 7# 0x00007F1A882EA008 in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+ 8# _PyObject_Call in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+ 9# _PyEval_EvalFrameDefault in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+10# 0x00007F1A883843AF in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+11# _PyEval_EvalFrameDefault in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+12# 0x00007F1A883843AF in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+13# PyEval_EvalCode in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+14# 0x00007F1A883CE4CD in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+15# _PyRun_SimpleFileObject in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+16# _PyRun_AnyFileObject in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+17# Py_RunMain in /lib/x86_64-linux-gnu/libpython3.10.so.1.0
+18# main in openroad
+19# 0x00007F1A87C8DD90 in /lib/x86_64-linux-gnu/libc.so.6
+20# __libc_start_main in /lib/x86_64-linux-gnu/libc.so.6
+21# _start in openroad
+Segmentation fault (core dumped)

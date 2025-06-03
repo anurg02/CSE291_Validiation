@@ -1,0 +1,95 @@
+Features included (+) or not (-): +GPU +GUI +Python : None
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+[WARNING ORD-0039] .openroad ignored with -python
+Reading liberty files...
+  Reading fakeram45_256x96.lib
+  Reading fakeram45_64x64.lib
+  Reading fakeram45_128x32.lib
+  Reading fakeram45_512x64.lib
+  Reading fakeram45_64x124.lib
+  Reading fakeram45_256x32.lib
+  Reading fakeram45_256x16.lib
+  Reading fakeram45_32x32.lib
+  Reading fakeram45_256x95.lib
+  Reading fakeram45_256x34.lib
+  Reading fakeram45_64x15.lib
+  Reading fakeram45_64x7.lib
+  Reading fakeram45_64x96.lib
+  Reading fakeram45_64x21.lib
+  Reading fakeram45_1024x32.lib
+  Reading fakeram45_64x62.lib
+  Reading fakeram45_256x48.lib
+  Reading NangateOpenCellLibrary_typical.lib
+  Reading fakeram45_128x256.lib
+  Reading fakeram45_128x116.lib
+  Reading fakeram45_64x32.lib
+  Reading fakeram45_32x64.lib
+  Reading fakeram45_2048x39.lib
+Reading technology LEF files...
+  Reading NangateOpenCellLibrary.tech.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/NangateOpenCellLibrary.tech.lef, created 22 layers, 27 vias
+Reading cell LEF files...
+  Reading fakeram45_64x21.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_64x21.lef, created 1 library cells
+  Reading fakeram45_256x32.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_256x32.lef, created 1 library cells
+  Reading fakeram45_512x64.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_512x64.lef, created 1 library cells
+  Reading fakeram45_256x48.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_256x48.lef, created 1 library cells
+  Reading fakeram45_64x32.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_64x32.lef, created 1 library cells
+  Reading fakeram45_2048x39.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_2048x39.lef, created 1 library cells
+  Reading NangateOpenCellLibrary.tech.lef
+[WARNING ODB-0229] Error: library (NangateOpenCellLibrary.tech) already exists
+  Reading NangateOpenCellLibrary.macro.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/NangateOpenCellLibrary.macro.lef, created 134 library cells
+  Reading fakeram45_32x32.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_32x32.lef, created 1 library cells
+  Reading fakeram45_256x16.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_256x16.lef, created 1 library cells
+  Reading fakeram45_128x116.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_128x116.lef, created 1 library cells
+  Reading fakeram45_128x32.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_128x32.lef, created 1 library cells
+  Reading fakeram45_64x124.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_64x124.lef, created 1 library cells
+  Reading fakeram45_64x96.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_64x96.lef, created 1 library cells
+  Reading fakeram45_256x96.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_256x96.lef, created 1 library cells
+  Reading fakeram45_64x7.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_64x7.lef, created 1 library cells
+  Reading fakeram45_64x15.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_64x15.lef, created 1 library cells
+  Reading fakeram45_1024x32.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_1024x32.lef, created 1 library cells
+  Reading NangateOpenCellLibrary.macro.rect.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/NangateOpenCellLibrary.macro.rect.lef, created 134 library cells
+  Reading fakeram45_128x256.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_128x256.lef, created 1 library cells
+  Reading fakeram45_64x64.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_64x64.lef, created 1 library cells
+  Reading NangateOpenCellLibrary.macro.mod.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/NangateOpenCellLibrary.macro.mod.lef, created 135 library cells
+  Reading fakeram45_256x95.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_256x95.lef, created 1 library cells
+  Reading fakeram45_32x64.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_32x64.lef, created 1 library cells
+  Reading fakeram45_256x34.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_256x34.lef, created 1 library cells
+  Reading fakeram45_64x62.lef
+[INFO ODB-0227] LEF file: ../../../Design/nangate45/lef/fakeram45_64x62.lef, created 1 library cells
+Reading Verilog file: 1_synth.v
+Linking design: gcd
+Setting clock...
+Performing floorplanning...
+[WARNING IFP-0028] Core area lower left (12.000, 12.000) snapped to (12.160, 12.600).
+[INFO IFP-0001] Added 26 rows of 199 site FreePDK45_38x28_10R_NP_162NW_34O.
+Traceback (most recent call last):
+  File "/work/OpenROAD-Agent/EDA-Corpus-v2/v1_analysis/multi_agent/script.py", line 129, in <module>
+    design.writeDef(outputDir / "floorplan.def")
+  File "openroad.py", line 484, in writeDef
+TypeError: in method 'Design_writeDef', argument 2 of type 'std::string const &'
