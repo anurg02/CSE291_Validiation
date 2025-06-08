@@ -12,16 +12,15 @@ links:
 
 ### Manual Script testing 
 - To be able to validate the results you have to run the script in your Docker container. (Assuming you have already installed OpenROAD and able to run ORFS.) 
-- Inside the OpenROAD container's work dir, clone this repository and cd into the EDA-Corpus-v2 directory. Create a new python file for the python script (obtained from the EDAgent).
+- Inside the OpenROAD container's work dir, clone this repository and cd into the validation_dir directory. Create a new python file for the python script (obtained from the EDAgent).
 - To run the script use following command
   
 `openroad -python -exit name_of_your_script.py`
 
-### Automated validation 
-- To test the bench that is to test a batch of scripts generated from the EDAgent as a .csv file follow the following procedure. 
-- Put your .csv file in the EDA-Corpus-v2 directory. Update the name of the .csv file in the script accordingly (name call for the script).
-- The script picks top 10 codes from the .csv file you can change this number as per your requirement. 
+### Automated validation (Only to test the bench for EDAgent)
+- To test the bench that is to test a batch of scripts generated from the EDAgent as a ".csv" file follow the following procedure. 
+- Put your .csv file in the "validation_dir" directory. Update the name of the .csv file in the script file "auto_flow_script_RAG.py" accordingly.
 - Run the following code.
-  `python3 script_name.py`
-- After a successfull run you will be able to see the results in the results directory. You will find log file for each script ran along with that script. 
+  `python3 auto_flow_script_RAG.py`
+- After a successfull run you will be able to see the results in the results directory. You will find log file for each script ran along with that script file. 
 
