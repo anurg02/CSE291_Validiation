@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 
 # === Select which file to use ===
-df = pd.read_csv("RAG_non-thinking-v2_updated_fixed.csv")
+df = pd.read_csv("RAG_non-thinking-v3.csv")
 code_column = "response"  # or "final_script" for the other CSV
 
 results = []
