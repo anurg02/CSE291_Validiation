@@ -19,7 +19,7 @@ links:
 
 ### Automated validation (Only to test the bench for EDAgent)
 - To test the bench that is to test a batch of scripts generated from the EDAgent as a ".csv" file follow the following procedure. 
-- Put your .csv file in the "validation_dir" directory. Update the name of the .csv file in the script file "auto_flow_script_RAG.py" accordingly.
+- There is a python script called "auto_flow_script_RAG.py" which will automate the flow to test the scripts. Put your .csv file in the "validation_dir" directory. Update the name of the .csv file in the script accordingly.
 - Run the following code.
   `python3 auto_flow_script_RAG.py`
 - After a successfull run you will be able to see the results in the results directory. You will find log file for each script ran along with that script file. 
