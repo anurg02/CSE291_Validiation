@@ -36,9 +36,8 @@ Wrong number or type of arguments for overloaded function 'Opendp_detailedPlacem
 - Note that this error exists because of a minor change in API used by our OpenROAD version and the OpenROAD version assumed by the EDA corpus scripts.
 - This is an accepted error if the script fails to run #only because of this we can still consider this as a success.
 - If you want to test the full run of the script. Make following changes to the API call.
-  '''
-  design.getOpendp().detailedPlacement(max_disp_x, max_disp_y, "") // don't pass the last argument.
-  '''
+
+ ` design.getOpendp().detailedPlacement(max_disp_x, max_disp_y, "") // don't pass the last argument.`
   
 
   
